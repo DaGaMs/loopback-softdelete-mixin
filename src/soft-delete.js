@@ -1,5 +1,6 @@
 import _debug from './debug';
 const debug = _debug();
+const _ = require('lodash');
 
 export default (Model, { deletedAt = 'deletedAt', _isDeleted = '_isDeleted', scrub = false }) => {
   debug('SoftDelete mixin for Model %s', Model.modelName);
@@ -56,10 +57,13 @@ export default (Model, { deletedAt = 'deletedAt', _isDeleted = '_isDeleted', scr
   const _findOrCreate = Model.findOrCreate;
   Model.findOrCreate = function findOrCreateDeleted(query = {}, ...rest) {
     if (!query.deleted) {
-      if (!query.where) {
+      if (!query.where || _.isEmpty(query.where)) {
         query.where = queryNonDeleted;
       } else {
-        query.where = { and: [ query.where, queryNonDeleted ] };
+        if (_.isEmpty(query.where))
+          query.where = queryNonDeleted;
+        else
+          query.where = { and: [ query.where, queryNonDeleted ] };
       }
     }
 
@@ -69,10 +73,13 @@ export default (Model, { deletedAt = 'deletedAt', _isDeleted = '_isDeleted', scr
   const _find = Model.find;
   Model.find = function findDeleted(query = {}, ...rest) {
     if (!query.deleted) {
-      if (!query.where) {
+      if (!query.where || _.isEmpty(query.where)) {
         query.where = queryNonDeleted;
       } else {
-        query.where = { and: [ query.where, queryNonDeleted ] };
+        if (_.isEmpty(query.where))
+          query.where = queryNonDeleted;
+        else
+          query.where = { and: [ query.where, queryNonDeleted ] };
       }
     }
 
@@ -82,14 +89,18 @@ export default (Model, { deletedAt = 'deletedAt', _isDeleted = '_isDeleted', scr
   const _count = Model.count;
   Model.count = function countDeleted(where = {}, ...rest) {
     // Because count only receives a 'where', there's nowhere to ask for the deleted entities.
-    const whereNotDeleted = { and: [ where, queryNonDeleted ] };
+    let whereNotDeleted = queryNonDeleted;
+    if (! _.isEmpty(where))
+      whereNotDeleted = { and: [ where, queryNonDeleted ] };
     return _count.call(Model, whereNotDeleted, ...rest);
   };
 
   const _update = Model.update;
   Model.update = Model.updateAll = function updateDeleted(where = {}, ...rest) {
     // Because update/updateAll only receives a 'where', there's nowhere to ask for the deleted entities.
-    const whereNotDeleted = { and: [ where, queryNonDeleted ] };
+    let whereNotDeleted = queryNonDeleted;
+    if (! _.isEmpty(where))
+      whereNotDeleted = { and: [ where, queryNonDeleted ] };
     return _update.call(Model, whereNotDeleted, ...rest);
   };
 };
