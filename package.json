@@ -6,6 +6,7 @@
   "scripts": {
     "preversion": "npm test",
     "pretest": "eslint ./src/*.js && gulp babel",
+    "prepublish": "gulp babel",
     "test": "_mocha --compilers js:babel-core/register",
     "watch": "gulp",
     "outdated": "npm outdated --depth=0"
