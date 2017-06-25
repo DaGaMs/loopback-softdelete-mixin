@@ -27,7 +27,7 @@ export default (Model, { deletedAt = 'deletedAt', _isDeleted = '_isDeleted', scr
       cb = options;
       options = undefined;
     }
-    return Model.updateAll(where, { ...scrubbed, [deletedAt]: new Date(), [_isDeleted]: true }, options)
+    Model.updateAll(where, { ...scrubbed, [deletedAt]: new Date(), [_isDeleted]: true }, options)
       .then(result => (typeof cb === 'function') ? cb(null, result) : result)
       .catch(error => (typeof cb === 'function') ? cb(error) : Promise.reject(error));
   };
@@ -40,7 +40,7 @@ export default (Model, { deletedAt = 'deletedAt', _isDeleted = '_isDeleted', scr
       cb = options;
       options = undefined;
     }
-    return Model.updateAll({ id: id }, { ...scrubbed, [deletedAt]: new Date(), [_isDeleted]: true }, options)
+    Model.updateAll({ id: id }, { ...scrubbed, [deletedAt]: new Date(), [_isDeleted]: true }, options)
       .then(result => (typeof cb === 'function') ? cb(null, result) : result)
       .catch(error => (typeof cb === 'function') ? cb(error) : Promise.reject(error));
   };
@@ -51,7 +51,7 @@ export default (Model, { deletedAt = 'deletedAt', _isDeleted = '_isDeleted', scr
   Model.prototype.destroy = function softDestroy(options, cb) {
     const callback = (cb === undefined && typeof options === 'function') ? options : cb;
 
-    return this.updateAttributes({ ...scrubbed, [deletedAt]: new Date(), [_isDeleted]: true })
+    this.updateAttributes({ ...scrubbed, [deletedAt]: new Date(), [_isDeleted]: true })
       .then(result => (typeof cb === 'function') ? callback(null, result) : result)
       .catch(error => (typeof cb === 'function') ? callback(error) : Promise.reject(error));
   };
