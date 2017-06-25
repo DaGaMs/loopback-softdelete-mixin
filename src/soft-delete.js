@@ -64,15 +64,11 @@ export default (Model, { deletedAt = 'deletedAt', _isDeleted = '_isDeleted', scr
 
   const _findOrCreate = Model.findOrCreate;
   Model.findOrCreate = function findOrCreateDeleted(query = {}, ...rest) {
-    if (!query.deleted) {
+    if (!query.deleted && !query[_isDeleted]) {
       if (!query.where || _.isEmpty(query.where)) {
         query.where = queryNonDeleted;
       } else {
-        if (_.isEmpty(query.where)) {
-          query.where = queryNonDeleted;
-        } else {
-          query.where = { and: [ query.where, queryNonDeleted ] };
-        }
+        query.where = { and: [ query.where, queryNonDeleted ] };
       }
     }
 
@@ -81,15 +77,11 @@ export default (Model, { deletedAt = 'deletedAt', _isDeleted = '_isDeleted', scr
 
   const _find = Model.find;
   Model.find = function findDeleted(query = {}, ...rest) {
-    if (!query.deleted) {
+    if (!query.deleted && !query[_isDeleted]) {
       if (!query.where || _.isEmpty(query.where)) {
         query.where = queryNonDeleted;
       } else {
-        if (_.isEmpty(query.where)) {
-          query.where = queryNonDeleted;
-        } else {
-          query.where = { and: [ query.where, queryNonDeleted ] };
-        }
+        query.where = { and: [ query.where, queryNonDeleted ] };
       }
     }
 
@@ -101,7 +93,11 @@ export default (Model, { deletedAt = 'deletedAt', _isDeleted = '_isDeleted', scr
     // Because count only receives a 'where', there's nowhere to ask for the deleted entities.
     let whereNotDeleted = queryNonDeleted;
     if (! _.isEmpty(where)) {
-      whereNotDeleted = { and: [ where, queryNonDeleted ] };
+      if (where[_isDeleted]) {
+        whereNotDeleted = where;  
+      } else {
+        whereNotDeleted = { and: [ where, queryNonDeleted ] };
+      }
     }
     return _count.call(Model, whereNotDeleted, ...rest);
   };
@@ -111,7 +107,11 @@ export default (Model, { deletedAt = 'deletedAt', _isDeleted = '_isDeleted', scr
     // Because update/updateAll only receives a 'where', there's nowhere to ask for the deleted entities.
     let whereNotDeleted = queryNonDeleted;
     if (! _.isEmpty(where)) {
-      whereNotDeleted = { and: [ where, queryNonDeleted ] };
+      if (where[_isDeleted]) {
+        whereNotDeleted = where;  
+      } else {
+        whereNotDeleted = { and: [ where, queryNonDeleted ] };
+      }
     }
     return _update.call(Model, whereNotDeleted, ...rest);
   };
