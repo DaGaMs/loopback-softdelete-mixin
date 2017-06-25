@@ -64,11 +64,12 @@ export default (Model, { deletedAt = 'deletedAt', _isDeleted = '_isDeleted', scr
 
   const _findOrCreate = Model.findOrCreate;
   Model.findOrCreate = function findOrCreateDeleted(query = {}, ...rest) {
-    if (!query.deleted && !query[_isDeleted]) {
+    if (!query.deleted) {
       if (!query.where || _.isEmpty(query.where)) {
         query.where = queryNonDeleted;
       } else {
-        query.where = { and: [ query.where, queryNonDeleted ] };
+        if (!query.where[_isDeleted]) // this should be a deep check!
+          query.where = { and: [ query.where, queryNonDeleted ] };
       }
     }
 
@@ -77,11 +78,12 @@ export default (Model, { deletedAt = 'deletedAt', _isDeleted = '_isDeleted', scr
 
   const _find = Model.find;
   Model.find = function findDeleted(query = {}, ...rest) {
-    if (!query.deleted && !query[_isDeleted]) {
+    if (!query.deleted) {
       if (!query.where || _.isEmpty(query.where)) {
         query.where = queryNonDeleted;
       } else {
-        query.where = { and: [ query.where, queryNonDeleted ] };
+        if (!query.where[_isDeleted]) // this should be a deep check!
+          query.where = { and: [ query.where, queryNonDeleted ] };
       }
     }
 
