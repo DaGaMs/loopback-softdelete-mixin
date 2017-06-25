@@ -60,7 +60,7 @@ export default (Model, { deletedAt = 'deletedAt', _isDeleted = '_isDeleted', scr
   Model.prototype.delete = Model.prototype.destroy;
 
   // Emulate default scope but with more flexibility.
-  const queryNonDeleted = {_isDeleted: false};
+  const queryNonDeleted = {[_isDeleted]: false};
 
   const _findOrCreate = Model.findOrCreate;
   Model.findOrCreate = function findOrCreateDeleted(query = {}, ...rest) {
