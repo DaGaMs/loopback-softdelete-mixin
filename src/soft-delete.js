@@ -60,10 +60,11 @@ export default (Model, { deletedAt = 'deletedAt', _isDeleted = '_isDeleted', scr
       if (!query.where || _.isEmpty(query.where)) {
         query.where = queryNonDeleted;
       } else {
-        if (_.isEmpty(query.where))
+        if (_.isEmpty(query.where)) {
           query.where = queryNonDeleted;
-        else
+        } else {
           query.where = { and: [ query.where, queryNonDeleted ] };
+        }
       }
     }
 
@@ -76,10 +77,11 @@ export default (Model, { deletedAt = 'deletedAt', _isDeleted = '_isDeleted', scr
       if (!query.where || _.isEmpty(query.where)) {
         query.where = queryNonDeleted;
       } else {
-        if (_.isEmpty(query.where))
+        if (_.isEmpty(query.where)) {
           query.where = queryNonDeleted;
-        else
+        } else {
           query.where = { and: [ query.where, queryNonDeleted ] };
+        }
       }
     }
 
@@ -90,8 +92,9 @@ export default (Model, { deletedAt = 'deletedAt', _isDeleted = '_isDeleted', scr
   Model.count = function countDeleted(where = {}, ...rest) {
     // Because count only receives a 'where', there's nowhere to ask for the deleted entities.
     let whereNotDeleted = queryNonDeleted;
-    if (! _.isEmpty(where))
+    if (! _.isEmpty(where)) {
       whereNotDeleted = { and: [ where, queryNonDeleted ] };
+    }
     return _count.call(Model, whereNotDeleted, ...rest);
   };
 
@@ -99,8 +102,9 @@ export default (Model, { deletedAt = 'deletedAt', _isDeleted = '_isDeleted', scr
   Model.update = Model.updateAll = function updateDeleted(where = {}, ...rest) {
     // Because update/updateAll only receives a 'where', there's nowhere to ask for the deleted entities.
     let whereNotDeleted = queryNonDeleted;
-    if (! _.isEmpty(where))
+    if (! _.isEmpty(where)) {
       whereNotDeleted = { and: [ where, queryNonDeleted ] };
+    }
     return _update.call(Model, whereNotDeleted, ...rest);
   };
 };
